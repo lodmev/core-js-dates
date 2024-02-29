@@ -6,7 +6,7 @@
  * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl       *
  *                                                                                             *
  ********************************************************************************************* */
-
+const padNumber = (number) => number.toString().padStart(2, 0);
 /**
  * By the passed date returns the number of seconds elapsed since 00:00 01.01.1970.
  *
@@ -32,7 +32,6 @@ function dateToTimestamp(date) {
  * Date(2015, 10, 20, 23, 15, 1) => '23:15:01'
  */
 function getTime(date) {
-  const padNumber = (number) => number.toString().padStart(2, 0);
   return `${padNumber(date.getHours())}:${padNumber(date.getMinutes())}:${padNumber(date.getSeconds())}`;
 }
 
@@ -145,14 +144,17 @@ function getCountDaysOnPeriod(dateStart, dateEnd) {
  * '2024-02-02', { start: '2024-02-02', end: '2024-03-02' } => true
  * '2024-02-10', { start: '2024-02-02', end: '2024-03-02' } => true
  */
-function isDateInPeriod(/* date, period */) {
-  throw new Error('Not implemented');
+function isDateInPeriod(date, period) {
+  const currentDate = new Date(date);
+  const startDate = new Date(period.start);
+  const endDate = new Date(period.end);
+  return currentDate >= startDate && currentDate <= endDate;
 }
 
 /**
  * Returns the date formatted in 'M/D/YYYY, hh:mm:ss a'.
  *
- * @param {string} date - The date to be formatted, in ISO 8601 format (e.g., 'YYYY-MM-DDTHH:mm:ss.sssZ').
+ * @param {string} gotDate - The date to be formatted, in ISO 8601 format (e.g., 'YYYY-MM-DDTHH:mm:ss.sssZ').
  * @return {string} - The date formatted in 'Month/Day/Year, Hour:Minute:Second AM/PM'.
  *
  * @example:
@@ -160,8 +162,15 @@ function isDateInPeriod(/* date, period */) {
  * '1999-01-05T02:20:00.000Z' => '1/5/1999, 2:20:00 AM'
  * '2010-12-15T22:59:00.000Z' => '12/15/2010, 10:59:00 PM'
  */
-function formatDate(/* date */) {
-  throw new Error('Not implemented');
+function formatDate(date) {
+  const gotDate = new Date(date);
+  function timeFormatter() {
+    const hour24 = gotDate.getUTCHours();
+    const postfix = hour24 < 12 ? 'AM' : 'PM';
+    const hours = hour24 % 12 || 12;
+    return `${hours}:${padNumber(gotDate.getUTCMinutes())}:${padNumber(gotDate.getUTCSeconds())} ${postfix}`;
+  }
+  return `${gotDate.getUTCMonth() + 1}/${gotDate.getUTCDate()}/${gotDate.getUTCFullYear()}, ${timeFormatter()}`;
 }
 
 /**
@@ -176,8 +185,18 @@ function formatDate(/* date */) {
  * 12, 2023 => 10
  * 1, 2024 => 8
  */
-function getCountWeekendsInMonth(/* month, year */) {
-  throw new Error('Not implemented');
+function getCountWeekendsInMonth(month, year) {
+  const date = new Date(year, month - 1);
+  let weekends = 0;
+  const countDays = getCountDaysInMonth(month, year);
+  for (let i = 1; i <= countDays; i += 1) {
+    date.setDate(i);
+    const day = date.getDay();
+    if (day === 0 || day === 6) {
+      weekends += 1;
+    }
+  }
+  return weekends;
 }
 
 /**
@@ -191,8 +210,11 @@ function getCountWeekendsInMonth(/* month, year */) {
  * Date(2024, 0, 31) => 5
  * Date(2024, 1, 23) => 8
  */
-function getWeekNumberByDate(/* date */) {
-  throw new Error('Not implemented');
+function getWeekNumberByDate(date) {
+  const millisecondsInDay = 60 * 60 * 24 * 1000;
+  const yearBeginningDate = new Date(date.getFullYear(), 0, 1);
+  const daysFromYearBegin = (date - yearBeginningDate) / millisecondsInDay;
+  return Math.ceil((daysFromYearBegin + 1 + yearBeginningDate.getDay()) / 7);
 }
 
 /**
