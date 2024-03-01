@@ -253,8 +253,18 @@ function getNextFridayThe13th(date) {
  * Date(2024, 5, 1) => 2
  * Date(2024, 10, 10) => 4
  */
-function getQuarter(/* date */) {
-  throw new Error('Not implemented');
+function getQuarter(date) {
+  const month = date.getMonth();
+  switch (true) {
+    case month >= 10:
+      return 4;
+    case month >= 6:
+      return 3;
+    case month >= 3:
+      return 2;
+    default:
+      return 1;
+  }
 }
 
 /**
@@ -275,8 +285,26 @@ function getQuarter(/* date */) {
  * { start: '01-01-2024', end: '15-01-2024' }, 1, 3 => ['01-01-2024', '05-01-2024', '09-01-2024', '13-01-2024']
  * { start: '01-01-2024', end: '10-01-2024' }, 1, 1 => ['01-01-2024', '03-01-2024', '05-01-2024', '07-01-2024', '09-01-2024']
  */
-function getWorkSchedule(/* period, countWorkDays, countOffDays */) {
-  throw new Error('Not implemented');
+function getWorkSchedule(period, countWorkDays, countOffDays) {
+  function getDate(dateStr) {
+    const [date, month, year] = dateStr.split('-');
+    return new Date(year, month - 1, date);
+  }
+  const startPeriodDate = getDate(period.start);
+  const endPeriodDate = getDate(period.end);
+  const schedule = [];
+  while (startPeriodDate <= endPeriodDate) {
+    for (let i = 0; i < countWorkDays; i += 1) {
+      if (startPeriodDate <= endPeriodDate) {
+        schedule.push(
+          `${padNumber(startPeriodDate.getDate())}-${padNumber(startPeriodDate.getMonth() + 1)}-${startPeriodDate.getFullYear()}`
+        );
+      }
+      startPeriodDate.setDate(startPeriodDate.getDate() + 1);
+    }
+    startPeriodDate.setDate(startPeriodDate.getDate() + countOffDays);
+  }
+  return schedule;
 }
 
 /**
@@ -291,8 +319,10 @@ function getWorkSchedule(/* period, countWorkDays, countOffDays */) {
  * Date(2022, 2, 1) => false
  * Date(2020, 2, 1) => true
  */
-function isLeapYear(/* date */) {
-  throw new Error('Not implemented');
+function isLeapYear(date) {
+  const february28Date = new Date(date.getFullYear(), 1, 28);
+  february28Date.setDate(february28Date.getDate() + 1);
+  return february28Date.getDate() === 29;
 }
 
 module.exports = {
