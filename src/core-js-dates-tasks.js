@@ -154,7 +154,7 @@ function isDateInPeriod(date, period) {
 /**
  * Returns the date formatted in 'M/D/YYYY, hh:mm:ss a'.
  *
- * @param {string} gotDate - The date to be formatted, in ISO 8601 format (e.g., 'YYYY-MM-DDTHH:mm:ss.sssZ').
+ * @param {string} date - The date to be formatted, in ISO 8601 format (e.g., 'YYYY-MM-DDTHH:mm:ss.sssZ').
  * @return {string} - The date formatted in 'Month/Day/Year, Hour:Minute:Second AM/PM'.
  *
  * @example:
@@ -228,8 +228,18 @@ function getWeekNumberByDate(date) {
  * Date(2024, 0, 13) => Date(2024, 8, 13)
  * Date(2023, 1, 1) => Date(2023, 9, 13)
  */
-function getNextFridayThe13th(/* date */) {
-  throw new Error('Not implemented');
+function getNextFridayThe13th(date) {
+  const nextFridayDate = new Date(date);
+  for (let i = 0; i < 7; i += 1) {
+    nextFridayDate.setDate(nextFridayDate.getDate() + 1);
+    if (nextFridayDate.getDay() === 5) {
+      break;
+    }
+  }
+  while (nextFridayDate.getDate() !== 13) {
+    nextFridayDate.setDate(nextFridayDate.getDate() + 7);
+  }
+  return nextFridayDate;
 }
 
 /**
